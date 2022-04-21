@@ -6,7 +6,7 @@ class ComputeVelocity {
 public:
 	ComputeVelocity(){
 		this->sensorInput=this->n.subscribe("/wheel_states", 1000, &ComputeVelocity::sensorCallback,this);
-		this->velocitiesPub=this->n.advertise<geometry_msgs::TwistStamped>("/cmd_vel", 1000);
+		//this->velocitiesPub=this->n.advertise<geometry_msgs::TwistStamped>("/cmd_vel", 1000);
 	}
     void mainLoop(){
         ros::Rate loop_rate(10);
@@ -17,14 +17,18 @@ public:
         
     }
     void sensorCallback(const sensor_msgs::JointState::ConstPtr& msg){
+        size_t rot_size = msg->velocity.size();
+        //double rot_spd[rot_size];
+        ROS_INFO("Dim: %d", rot_size);
         for (int i = 0; i<4; i++) {
             rot_spd[i] = msg->velocity[i];
+            ROS_INFO("Rot spd %d: %f", i, msg->velocity[i]);
         }
     }
 private:
 	ros::NodeHandle n;
 	ros::Subscriber sensorInput;
-	ros::Publisher velocitiesPub;
+	//ros::Publisher velocitiesPub;
     double rot_spd[4];
 };
 

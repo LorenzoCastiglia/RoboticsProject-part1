@@ -129,6 +129,8 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(test_listener src/test_listener.cpp)
 target_link_libraries(test_listener ${catkin_LIBRARIES})
+add_executable(velocities src/velocities.cpp)
+target_link_libraries(velocities ${catkin_LIBRARIES})
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
