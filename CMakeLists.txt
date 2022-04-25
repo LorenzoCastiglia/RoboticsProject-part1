@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   sensor_msgs
   std_msgs
+  nav_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -131,6 +132,8 @@ add_executable(test_listener src/test_listener.cpp)
 target_link_libraries(test_listener ${catkin_LIBRARIES})
 add_executable(velocities src/velocities.cpp)
 target_link_libraries(velocities ${catkin_LIBRARIES})
+add_executable(velocitiesTicks src/velocitiesTicks.cpp)
+target_link_libraries(velocitiesTicks ${catkin_LIBRARIES})
 add_executable(odometry src/odometry.cpp)
 target_link_libraries(odometry ${catkin_LIBRARIES})
 
