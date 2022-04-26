@@ -135,6 +135,7 @@ add_executable(velocitiesTicks src/velocitiesTicks.cpp)
 target_link_libraries(velocitiesTicks ${catkin_LIBRARIES})
 add_executable(odometry src/odometry.cpp)
 add_dependencies(odometry ${catkin_EXPORTED_TARGETS})
+add_dependencies(odometry project_1_generate_messages)
 target_link_libraries(odometry ${catkin_LIBRARIES})
 
 ## Rename C++ executable without prefix

@@ -10,6 +10,7 @@ public:
     ComputeOdometry() {
         
         this->velInput=this->n.subscribe("/cmd_vel", 1000, &ComputeOdometry::eulerOdometry, this);
+        this->odomPub=this->n.advertise<nav_msgs::Odometry>("/odom", 1000);
         this-> resetService = this->n.advertiseService("reset", &ComputeOdometry::resetCallback, this);
                 
         this->x0 = 0.0;

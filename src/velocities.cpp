@@ -35,6 +35,8 @@ public:
         ROS_INFO("W z: %f", wz);
 
         geometry_msgs::TwistStamped velMsg;
+        velMsg.header.stamp.sec = msg->header.stamp.sec;
+        velMsg.header.stamp.nsec = msg -> header.stamp.nsec;
         velMsg.twist.linear.x = this -> vx;
         velMsg.twist.linear.y = this -> vy;
         velMsg.twist.angular.z = this -> wz;

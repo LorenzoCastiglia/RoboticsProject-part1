@@ -29,6 +29,10 @@ public:
         }
         */
     }
+
+    double computeTimeStamp(geometry_msgs::TwistStamped::ConstPtr &msg) {
+        return msg->header.stamp.sec + msg->header.stamp.nsec * pow(10, -9);
+    }
     
     void sensorCallback(const sensor_msgs::JointState::ConstPtr& msg){
         
@@ -88,6 +92,8 @@ public:
 
                 // publishing cmd_vel message
                 geometry_msgs::TwistStamped velMsg;
+                velMsg.header.stamp.sec = msg->header.stamp.sec;
+                velMsg.header.stamp.nsec = msg -> header.stamp.nsec;
                 velMsg.twist.linear.x = this -> vx;
                 velMsg.twist.linear.y = this -> vy;
                 velMsg.twist.angular.z = this -> wz;
