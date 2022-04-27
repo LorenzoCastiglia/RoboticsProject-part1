@@ -2,8 +2,8 @@
 #include "geometry_msgs/TwistStamped.h"
 #include "nav_msgs/Odometry.h"
 #include "project_1/Reset.h"
-#include "dynamic_reconfigure/server.h"
-#include "project_1/parametersConfig.h"
+#include <dynamic_reconfigure/server.h>
+#include <project_1/parametersConfig.h>
 
 class ComputeOdometry {
 
@@ -79,8 +79,11 @@ public:
             ts = msg->header.stamp.sec + msg->header.stamp.nsec * pow(10, -9);
             deltats = ts - ts0;
             theta = theta0 + msg->twist.angular.z * deltats;
-            x = x0 + msg->twist.linear.x * deltats;
-            y = y0 + msg->twist.linear.y * deltats;
+            ROS_INFO("Theta: %f", theta);
+            x = x0 + deltats * (msg->twist.linear.x * cos (theta) + msg->twist.linear.y * sin (90.0 + theta));
+            ROS_INFO("X: %f", x);
+            y = y0 + deltats * (msg->twist.linear.x * sin (theta) + msg->twist.linear.y * sin (90.0 + theta));
+            ROS_INFO("Y: %f", y);
             theta0 = theta;
             x0 = x;
             y0 = y;
