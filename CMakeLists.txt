@@ -10,6 +10,8 @@ find_package(catkin REQUIRED COMPONENTS
   nav_msgs
   message_generation
   dynamic_reconfigure
+  tf2
+  tf2_ros
 )
 
 ## Generate messages in the 'msg' folder
@@ -64,3 +66,6 @@ add_executable(wheelsVel src/wheelsVel.cpp)
 add_dependencies(wheelsVel ${catkin_EXPORTED_TARGETS})
 add_dependencies(wheelsVel project_1_generate_messages)
 target_link_libraries(wheelsVel ${catkin_LIBRARIES})
+
+add_executable(tfBroadcast src/tfBroadcast.cpp)
+target_link_libraries(tfBroadcast ${catkin_LIBRARIES})
