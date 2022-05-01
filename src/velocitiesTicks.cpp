@@ -1,6 +1,7 @@
 #include "ros/ros.h"
 #include "sensor_msgs/JointState.h"
 #include "geometry_msgs/TwistStamped.h"
+#include <math.h>
 
 class ComputeVelocity {
 
@@ -14,7 +15,8 @@ public:
         this->ticfr0=0.0;
         this->ticrr0=0.0;
         this->ticrl0=0.0;
-        this->ts0=0.0;
+        this->ts0.sec = 0;
+        this->ts0.nsec = 0;
 	}
 
     void mainLoop(){
@@ -44,7 +46,7 @@ public:
                 // When the first message is received, the first values are saved but
                 // the velocities are not computed
 
-                ts0 = msg->header.stamp.sec + msg->header.stamp.nsec * pow(10, -9);
+                ts0 = msg->header.stamp;
 
                 ticfl0 = msg->position[0]/gearRatio;
                 ticfr0 = msg->position[1]/gearRatio;
@@ -54,41 +56,48 @@ public:
             else {
                 // Starting from the second iteration, velocities are computed and published
 
-                ts = msg->header.stamp.sec + msg->header.stamp.nsec * pow(10, -9);
+                ts = msg->header.stamp;
+                deltats = ts - ts0;
+                ROS_INFO("deltats: %lf", deltats.toSec());
+                ROS_INFO("msg count: %d", msgCount);
 
                 // front-left wheel
                 ticfl = msg->position[0]/gearRatio;
-                wfl = (ticfl - ticfl0)/(ts - ts0);
-                ROS_INFO("Rot fl: %f", wfl);
+                wfl = (ticfl - ticfl0)/deltats.toSec()*2*M_PI/tickResolution;
+                ROS_INFO("deltatic: %d", ticfl-ticfl0);
+                ROS_INFO("Rot fl: %lf", wfl);
                 ticfl0 = ticfl;
 
                 // front-right wheel
                 ticfr = msg->position[1]/gearRatio;
-                wfr = (ticfr - ticfr0)/(ts - ts0);
-                ROS_INFO("Rot fr: %f", wfr);
+                wfr = (ticfr - ticfr0)/deltats.toSec()*2*M_PI/tickResolution;
+                ROS_INFO("deltatic: %d", ticfr-ticfr0);
+                ROS_INFO("Rot fr: %lf", wfr);
                 ticfr0 = ticfr;
 
                 // rear-left wheel
                 ticrl = msg->position[2]/gearRatio;
-                wrl = (ticrl - ticrl0)/(ts - ts0);
-                ROS_INFO("Rot rl: %f", wrl);
+                wrl = (ticrl - ticrl0)/deltats.toSec()*2*M_PI/tickResolution;
+                ROS_INFO("deltatic: %d", ticrl-ticrl0);
+                ROS_INFO("Rot rl: %lf", wrl);
                 ticrl0 = ticrl;
 
                 // rear-right wheel
                 ticrr = msg->position[3]/gearRatio;
-                wrr = (ticrr - ticrr0)/(ts - ts0);
-                ROS_INFO("Rot rr: %f", wrr);
+                wrr = (ticrr - ticrr0)/deltats.toSec()*2*M_PI/tickResolution;
+                ROS_INFO("deltatic: %d", ticrr-ticrr0);
+                ROS_INFO("Rot rr: %lf", wrr);
                 ticrr0 = ticrr;
 
                 ts0 = ts;
 
                 // robot velocities
                 vx = (wfl+wfr+wrr+wrl)*wheelRadius/4;
-                ROS_INFO("Vel x: %f", vx);
+                ROS_INFO("Vel x: %lf", vx);
                 vy = (-wfl+wfr+wrl-wrr)*wheelRadius/4;
-                ROS_INFO("Vel y: %f", vy);
+                ROS_INFO("Vel y: %lf", vy);
                 wz = (-wfl+wfr-wrl+wrr)*wheelRadius/(4*(wheelRadius+halfLength));
-                ROS_INFO("W z: %f", wz);
+                ROS_INFO("W z: %lf", wz);
 
                 // publishing cmd_vel message
                 geometry_msgs::TwistStamped velMsg;
@@ -115,11 +124,12 @@ private:
     const double wheelRadius = 0.07;
     const double halfLength = 0.2;
     const double halfWidth = 0.169;
+    const double tickResolution = 42;
     double wfl, wfr, wrr, wrl;
-    uint32_t ticfl, ticfr, ticrr, ticrl;
-    uint32_t ticfl0, ticfr0, ticrr0, ticrl0;
-    double ts;
-    double ts0;
+    double ticfl, ticfr, ticrr, ticrl;
+    double ticfl0, ticfr0, ticrr0, ticrl0;
+    ros::Time ts, ts0;
+    ros::Duration deltats;
     double vx, vy, wz;
     int msgCount = 0;
     const int msgInterval = 5;

@@ -23,9 +23,9 @@ public:
         wfr = msg->velocity[1]/(60*gearRatio);
         ROS_INFO("Rot fr: %f", wfr);
         wrl = msg->velocity[2]/(60*gearRatio);
-        ROS_INFO("Rot rr: %f", wrl);
+        ROS_INFO("Rot rl: %f", wrl);
         wrr = msg->velocity[3]/(60*gearRatio);
-        ROS_INFO("Rot rl: %f", wrr);
+        ROS_INFO("Rot rr: %f", wrr);
 
         vx = (wfl+wfr+wrl+wrr)*wheelRadius/4;
         ROS_INFO("Vel x: %f", vx);

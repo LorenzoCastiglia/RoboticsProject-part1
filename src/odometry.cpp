@@ -2,6 +2,7 @@
 #include "geometry_msgs/TwistStamped.h"
 #include "nav_msgs/Odometry.h"
 #include "project_1/Reset.h"
+#include <tf2/LinearMath/Quaternion.h>
 #include <dynamic_reconfigure/server.h>
 #include <project_1/parametersConfig.h>
 
@@ -47,13 +48,23 @@ public:
         return msg->header.stamp.sec + msg->header.stamp.nsec * pow(10, -9);
     }
 
-    void publishOdometry() {
+    void publishOdometry(const geometry_msgs::TwistStamped::ConstPtr &msg) {
         // function that creates and publishes a nav_msgs::Odometry message on topic /odom
 
         nav_msgs::Odometry odomMsg;
+        tf2::Quaternion q;
+        q.setRPY(0, 0, this->theta0);
+
+        odomMsg.child_frame_id = "base_link";
+        odomMsg.header.frame_id = "odom";
+        odomMsg.header.stamp = msg -> header.stamp;
         odomMsg.pose.pose.position.x = this -> x0;
         odomMsg.pose.pose.position.y = this -> y0;
-        odomMsg.pose.pose.orientation.z = this -> theta0;
+        odomMsg.pose.pose.position.z = 0.0;
+        odomMsg.pose.pose.orientation.x = q.x();
+        odomMsg.pose.pose.orientation.y = q.y();
+        odomMsg.pose.pose.orientation.z = q.z();
+        odomMsg.pose.pose.orientation.w = q.w();
         this -> odomPub.publish(odomMsg);
     }
 
@@ -90,7 +101,7 @@ public:
             ts0 = ts;
 
             // creating and publishing the odometry message
-            publishOdometry();
+            publishOdometry(msg);
             /*
             nav_msgs::Odometry odomMsg;
             odomMsg.pose.pose.position.x = this -> x;
@@ -125,7 +136,7 @@ public:
             ts0 = ts;
 
             // creating and publishing the odometry message
-            publishOdometry();
+            publishOdometry(msg);
         }
     }
 
@@ -140,7 +151,20 @@ public:
         this->y0 = req.y_new;
         this->theta0 = req.theta_new;
 
-        publishOdometry();
+        //publishOdometry(msg);
+        nav_msgs::Odometry odomMsg;
+        tf2::Quaternion q;
+        q.setRPY(0, 0, this->theta0);
+
+        odomMsg.pose.pose.position.x = this -> x0;
+        odomMsg.pose.pose.position.y = this -> y0;
+        odomMsg.pose.pose.position.z = 0.0;
+        odomMsg.pose.pose.orientation.x = q.x();
+        odomMsg.pose.pose.orientation.y = q.y();
+        odomMsg.pose.pose.orientation.z = q.z();
+        odomMsg.pose.pose.orientation.w = q.w();
+        this -> odomPub.publish(odomMsg);
+
 
         ROS_INFO("\nOld pose: (%lf,%lf,%lf)\nNew pose: (%lf,%lf,%lf)", 
             res.x_old, res.y_old, res.theta_old, req.x_new, req.y_new, req.theta_new);
