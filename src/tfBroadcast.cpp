@@ -17,7 +17,7 @@ public:
         transformStamped.child_frame_id = "base_link";
         transformStamped.transform.translation.x = msg->pose.pose.position.x;
         transformStamped.transform.translation.y = msg->pose.pose.position.y;
-        transformStamped.transform.translation.y = msg->pose.pose.position.z;
+        transformStamped.transform.translation.z = msg->pose.pose.position.z;
         transformStamped.transform.rotation.x = msg->pose.pose.orientation.x;
         transformStamped.transform.rotation.y = msg->pose.pose.orientation.y;
         transformStamped.transform.rotation.z = msg->pose.pose.orientation.z;

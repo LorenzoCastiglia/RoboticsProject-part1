@@ -122,11 +122,11 @@ private:
 	ros::NodeHandle n;
 	ros::Subscriber sensorInput;
 	ros::Publisher velocitiesPub;
-    int gearRatio = 5;
-    double wheelRadius = 0.07;
-    double halfLength = 0.2;
-    double halfWidth = 0.169;
-    int tickResolution = 42;
+    int gearRatio;
+    double wheelRadius;
+    double halfLength;
+    double halfWidth;
+    int tickResolution;
     double wfl, wfr, wrr, wrl;
     double ticfl, ticfr, ticrr, ticrl;
     double ticfl0, ticfr0, ticrr0, ticrl0;

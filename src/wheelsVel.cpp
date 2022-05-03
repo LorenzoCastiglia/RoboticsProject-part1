@@ -50,10 +50,10 @@ private:
 	ros::NodeHandle n;
 	ros::Subscriber velInput;
 	ros::Publisher wheelPub;
-    int gearRatio = 5;
-    double wheelRadius = 0.07;
-    double halfLength = 0.2;
-    double halfWidth = 0.169;
+    int gearRatio;
+    double wheelRadius;
+    double halfLength;
+    double halfWidth;
     double wfl, wfr, wrl, wrr;
     double vx, vy, wz;
 };
