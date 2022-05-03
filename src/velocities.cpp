@@ -7,6 +7,12 @@ public:
 	ComputeVelocity(){
 		this->sensorInput=this->n.subscribe("/wheel_states", 1000, &ComputeVelocity::sensorCallback,this);
 		this->velocitiesPub=this->n.advertise<geometry_msgs::TwistStamped>("/cmd_vel", 1000);
+
+        n.getParam("/gearRatio", this->gearRatio);
+        n.getParam("/wheelRadius", this->wheelRadius);
+        n.getParam("/halfLenght", this->halfLength);
+        n.getParam("/halfWidth", this->halfWidth);
+        //n.getParam("/tickRes", this->tickResolution);
 	}
     void mainLoop(){
         ros::Rate loop_rate(10);
@@ -47,10 +53,10 @@ private:
 	ros::NodeHandle n;
 	ros::Subscriber sensorInput;
 	ros::Publisher velocitiesPub;
-    const int gearRatio = 5;
-    const double wheelRadius = 0.07;
-    const double halfLength = 0.2;
-    const double halfWidth = 0.169;
+    int gearRatio = 5;
+    double wheelRadius = 0.07;
+    double halfLength = 0.2;
+    double halfWidth = 0.169;
     double wfl, wfr, wrl, wrr;
     double vx, vy, wz;
 };

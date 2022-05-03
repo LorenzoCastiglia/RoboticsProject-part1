@@ -17,6 +17,11 @@ public:
         this->ticrl0=0.0;
         this->ts0.sec = 0;
         this->ts0.nsec = 0;
+        n.getParam("/gearRatio", this->gearRatio);
+        n.getParam("/wheelRadius", this->wheelRadius);
+        n.getParam("/halfLenght", this->halfLength);
+        n.getParam("/halfWidth", this->halfWidth);
+        n.getParam("/tickRes", this->tickResolution);
 	}
 
     void mainLoop(){
@@ -120,11 +125,11 @@ private:
 	ros::NodeHandle n;
 	ros::Subscriber sensorInput;
 	ros::Publisher velocitiesPub;
-    const int gearRatio = 5;
-    const double wheelRadius = 0.07;
-    const double halfLength = 0.2;
-    const double halfWidth = 0.169;
-    const double tickResolution = 42;
+    int gearRatio = 5;
+    double wheelRadius = 0.07;
+    double halfLength = 0.2;
+    double halfWidth = 0.169;
+    int tickResolution = 42;
     double wfl, wfr, wrr, wrl;
     double ticfl, ticfr, ticrr, ticrl;
     double ticfl0, ticfr0, ticrr0, ticrl0;

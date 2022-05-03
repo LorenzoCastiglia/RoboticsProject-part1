@@ -1,0 +1,7 @@
+<launch>
+    <param name="wheelRadius" value="0.07" />
+    <param name="halfLenght" value="0.2" />
+    <param name="halfWidth" value="0.169" />
+    <param name="gearRatio" value="5" />
+    <param name="tickRes" value="42" />
+</launch>
