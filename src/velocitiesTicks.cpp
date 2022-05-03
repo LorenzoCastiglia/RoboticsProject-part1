@@ -36,10 +36,7 @@ public:
         }
         */
     }
-
-    double computeTimeStamp(geometry_msgs::TwistStamped::ConstPtr &msg) {
-        return msg->header.stamp.sec + msg->header.stamp.nsec * pow(10, -9);
-    }
+    
     
     void sensorCallback(const sensor_msgs::JointState::ConstPtr& msg){
         

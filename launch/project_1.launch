@@ -1,7 +1,14 @@
 <launch>
+
     <param name="wheelRadius" value="0.07" />
     <param name="halfLenght" value="0.2" />
     <param name="halfWidth" value="0.169" />
     <param name="gearRatio" value="5" />
     <param name="tickRes" value="42" />
+
+    <node pkg="project_1" type="velocitiesTicks" name="ComputeVelocitiesTick" output="screen" />
+    <node pkg="project_1" type="odometry" name="ComputeOdometry" output="screen" />
+    <node pkg="project_1" type="tfBroadcast" name="tfBroadcast" output="screen" />
+    <node pkg="project_1" type="wheelsVel" name="WheelsVelocities" output="screen" />
+
 </launch>

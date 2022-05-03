@@ -19,7 +19,8 @@ public:
         this->x0 = 0.0;
         this->y0 = 0.0;
         this->theta0 = 0.0;
-        this->ts0 = 0.0;
+        this->ts0.sec = 0;
+        this->ts0.nsec = 0;
         this->set_method = 0;       // Euler integration method is set to default
 
 
@@ -83,17 +84,22 @@ public:
     void eulerOdometry(const geometry_msgs::TwistStamped::ConstPtr &msg) {
         // 1st order Euler integration, rotation is performed after the translation
 
-        if(ts0 == 0.0) {
-            ts0 = msg->header.stamp.sec + msg->header.stamp.nsec * pow(10, -9);
+        if(ts0.nsec == 0) {
+            // When the first message is received, the new timestamp is saved but no
+            // odometry is performed since we only have the first value of v and omega
+            ts0.sec = msg->header.stamp.sec; 
+            ts0.nsec = msg->header.stamp.nsec;
         }
+
         else {
-            ts = msg->header.stamp.sec + msg->header.stamp.nsec * pow(10, -9);
+            ts.sec = msg->header.stamp.sec; 
+            ts.nsec = msg->header.stamp.nsec;
             deltats = ts - ts0;
-            theta = theta0 + msg->twist.angular.z * deltats;
+            theta = theta0 + msg->twist.angular.z * deltats.toSec();
             ROS_INFO("Theta: %f", theta);
-            x = x0 + deltats * (msg->twist.linear.x * cos (theta) + msg->twist.linear.y * sin (90.0 + theta));
+            x = x0 + deltats.toSec() * (msg->twist.linear.x * cos (theta) + msg->twist.linear.y * sin (90.0 + theta));
             ROS_INFO("X: %f", x);
-            y = y0 + deltats * (msg->twist.linear.x * sin (theta) + msg->twist.linear.y * sin (90.0 + theta));
+            y = y0 + deltats.toSec() * (msg->twist.linear.x * sin (theta) + msg->twist.linear.y * sin (90.0 + theta));
             ROS_INFO("Y: %f", y);
             theta0 = theta;
             x0 = x;
@@ -102,32 +108,28 @@ public:
 
             // creating and publishing the odometry message
             publishOdometry(msg);
-            /*
-            nav_msgs::Odometry odomMsg;
-            odomMsg.pose.pose.position.x = this -> x;
-            odomMsg.pose.pose.position.y = this -> y;
-            odomMsg.pose.pose.orientation.z = this -> theta;
-            this -> odomPub.publish(odomMsg);
-            */
         }
     }
 
     void rungeKuttaOdometry(const geometry_msgs::TwistStamped::ConstPtr &msg) {
         // 2nd order Runge Kutta integration, theta changes during the translation
 
-        if(ts0 == 0.0) {
+        if(ts0.nsec == 0.0) {
             // When the first message is received, the new timestamp is saved but no
             // odometry is performed since we only have the first value of v and omega
-            ts0 = msg->header.stamp.sec + msg->header.stamp.nsec * pow(10, -9);
+            ts0.sec = msg->header.stamp.sec; 
+            ts0.nsec = msg->header.stamp.nsec;;
         }
+
         else {
             // starting from the second message received, the odometry is computed
-            ts = msg->header.stamp.sec + msg->header.stamp.nsec * pow(10, -9);
+            ts.sec = msg->header.stamp.sec; 
+            ts.nsec = msg->header.stamp.nsec;
             deltats = ts - ts0;
-            theta = theta0 + msg->twist.angular.z * deltats;
-            v_k = sqrt(pow(msg->twist.linear.x,2) + pow(msg->twist.linear.y,2));
-            x = x0 + v_k * deltats * cos(theta0 + (msg->twist.angular.z * deltats / 2));
-            y = y0 + v_k * deltats * sin(theta0 + (msg->twist.angular.z * deltats / 2));
+            theta_avg = theta0 + msg->twist.angular.z * deltats.toSec() / 2;
+            theta = theta0 + msg->twist.angular.z * deltats.toSec();
+            x = x0 + deltats.toSec() * (msg->twist.linear.x*cos(theta_avg) + msg->twist.linear.y*cos(90.0+theta_avg));
+            y = y0 + deltats.toSec() * (msg->twist.linear.x*sin(theta_avg) + msg->twist.linear.y*sin(90.0+theta_avg));
 
             // updating past values with current values
             theta0 = theta;
@@ -156,6 +158,8 @@ public:
         tf2::Quaternion q;
         q.setRPY(0, 0, this->theta0);
 
+        odomMsg.child_frame_id = "base_link";
+        odomMsg.header.frame_id = "odom";
         odomMsg.pose.pose.position.x = this -> x0;
         odomMsg.pose.pose.position.y = this -> y0;
         odomMsg.pose.pose.position.z = 0.0;
@@ -197,10 +201,9 @@ private:
 
     double x, y, theta;
     double x0, y0, theta0;
-    double ts0;
-    double ts;
-    double deltats;
-    double v_k;             // absolute value of the linear velocity
+    double theta_avg;
+    ros::Time ts,ts0;
+    ros::Duration deltats;
     int set_method;         // integration method: Euler = 0 , RK = 1
 };
 
