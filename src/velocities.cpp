@@ -15,12 +15,14 @@ public:
         //n.getParam("/tickRes", this->tickResolution);
 	}
     void mainLoop(){
-        ros::Rate loop_rate(10);
+        //ros::Rate loop_rate(10);
         ROS_INFO("Geometry node started\n");
+        ros::spin();
+        /*
         while (ros::ok()) {
             ros::spinOnce();
             loop_rate.sleep();
-        }
+        }*/
         
     }
     void sensorCallback(const sensor_msgs::JointState::ConstPtr& msg){
