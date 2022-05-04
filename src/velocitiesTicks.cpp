@@ -22,6 +22,7 @@ public:
         n.getParam("/halfLenght", this->halfLength);
         n.getParam("/halfWidth", this->halfWidth);
         n.getParam("/tickRes", this->tickResolution);
+        n.getParam("/msgInterval", this->msgInterval);
 	}
 
     void mainLoop(){
@@ -134,7 +135,7 @@ private:
     ros::Duration deltats;
     double vx, vy, wz;
     int msgCount = 0;
-    const int msgInterval = 5;
+    int msgInterval;
 
 };
 
