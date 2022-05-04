@@ -97,9 +97,9 @@ public:
             deltats = ts - ts0;
             theta = theta0 + msg->twist.angular.z * deltats.toSec();
             ROS_INFO("Theta: %f", theta);
-            x = x0 + deltats.toSec() * (msg->twist.linear.x * cos (theta) + msg->twist.linear.y * cos (90.0 + theta));
+            x = x0 + deltats.toSec() * (msg->twist.linear.x * cos (theta0) + msg->twist.linear.y * cos (90.0 + theta0));
             ROS_INFO("X: %f", x);
-            y = y0 + deltats.toSec() * (msg->twist.linear.x * sin (theta) + msg->twist.linear.y * sin (90.0 + theta));
+            y = y0 + deltats.toSec() * (msg->twist.linear.x * sin (theta0) + msg->twist.linear.y * sin (90.0 + theta0));
             ROS_INFO("Y: %f", y);
             theta0 = theta;
             x0 = x;

@@ -5,6 +5,7 @@
     <param name="halfWidth" value="0.169" />
     <param name="gearRatio" value="5" />
     <param name="tickRes" value="42" />
+    <param name="use_sim_time" value="true" />
 
     <node pkg="project_1" type="velocitiesTicks" name="ComputeVelocitiesTick" output="screen" />
     <node pkg="project_1" type="odometry" name="ComputeOdometry" output="screen" />
