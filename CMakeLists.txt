@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   dynamic_reconfigure
   tf2
   tf2_ros
+  message_filters
 )
 
 ## Generate messages in the 'msg' folder
@@ -37,7 +38,7 @@ generate_dynamic_reconfigure_options(
   cfg/parameters.cfg
 )
 
-catkin_package(CATKIN_DEPENDS geometry_msgs roscpp rospy sensor_msgs std_msgs message_runtime)
+catkin_package(CATKIN_DEPENDS geometry_msgs roscpp rospy sensor_msgs std_msgs message_runtime message_filters)
 
 ###########
 ## Build ##
@@ -69,3 +70,6 @@ target_link_libraries(wheelsVel ${catkin_LIBRARIES})
 
 add_executable(tfBroadcast src/tfBroadcast.cpp)
 target_link_libraries(tfBroadcast ${catkin_LIBRARIES})
+
+add_executable(checkParams src/checkParams.cpp)
+target_link_libraries(checkParams ${catkin_LIBRARIES})

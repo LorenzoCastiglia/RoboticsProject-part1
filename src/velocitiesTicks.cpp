@@ -99,7 +99,7 @@ public:
                 ROS_INFO("Vel x: %lf", vx);
                 vy = (-wfl+wfr+wrl-wrr)*wheelRadius/4;
                 ROS_INFO("Vel y: %lf", vy);
-                wz = (-wfl+wfr-wrl+wrr)*wheelRadius/(4*(wheelRadius+halfLength));
+                wz = (-wfl+wfr-wrl+wrr)*wheelRadius/(4*(halfWidth+halfLength));
                 ROS_INFO("W z: %lf", wz);
 
                 // publishing cmd_vel message

@@ -39,7 +39,7 @@ public:
         ROS_INFO("Vel x: %f", vx);
         vy = (-wfl+wfr+wrl-wrr)*wheelRadius/4;
         ROS_INFO("Vel y: %f", vy);
-        wz = (-wfl+wfr-wrl+wrr)*wheelRadius/(4*(wheelRadius+halfLength));
+        wz = (-wfl+wfr-wrl+wrr)*wheelRadius/(4*(halfWidth+halfLength));
         ROS_INFO("W z: %f", wz);
 
         geometry_msgs::TwistStamped velMsg;
