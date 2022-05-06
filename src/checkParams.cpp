@@ -10,14 +10,18 @@ class checkParams {
 
 public:
     checkParams() {
+        /*
         message_filters::Subscriber<sensor_msgs::JointState> wheelSub(n, "/wheel_states", 1);
         message_filters::Subscriber<geometry_msgs::PoseStamped> poseSub(n, "/robot/pose", 1);
         message_filters::TimeSynchronizer<geometry_msgs::PoseStamped, sensor_msgs::JointState> sync (poseSub, wheelSub, 10);
         sync.registerCallback(boost::bind(&checkParams::bagCallback, this, _1, _2));
-        this->x0 = 0.0;
-        this->y0 = 0.0;
-        this->theta0 = 0.0;
-        this->msgCount = -1;
+        */
+        this->wheelSub=this->n.subscribe("/wheel_states", 1000, &checkParams::wheelSubCallback,this);
+        this->poseSub=this->n.subscribe("/robot/pose", 1000, &checkParams::poseSubCallback,this);
+
+        this->paramCount = 0;
+        this->wheelCount = 0;
+        this->poseCount = 0;
         n.getParam("/gearRatio", this->gearRatio);
         n.getParam("/wheelRadius", this->wheelRad);
         n.getParam("/halfLenght", this->halfLength);
@@ -26,77 +30,99 @@ public:
     }
 
     void mainLoop(){
-        ROS_INFO("Param node started\n");
-
+        ROS_INFO("Param node started");
         ros::spin();
-        /*
-        ros::Rate loop_rate(10);
-        while (ros::ok()) {
-            ros::spinOnce();
-            loop_rate.sleep();
-        }
-        */
     }
 
-    void bagCallback(const geometry_msgs::PoseStamped::ConstPtr& msg1, const sensor_msgs::JointState::ConstPtr& msg2) {
-        ROS_INFO("Callback");
-        if(this->msgCount == -1) {
-            ts0 = msg1->header.stamp;
-            this -> x0 = msg1 -> pose.position.x;
-            this -> y0 = msg1 -> pose.position.y;
-            quat_msg = msg1 -> pose.orientation;
-            tf2::fromMsg(quat_msg, q);
-            tf2::Matrix3x3 m(q);
-            m.getRPY(roll, pitch, yaw);
-            this -> theta0 = yaw;
+    void wheelSubCallback(const sensor_msgs::JointState::ConstPtr& msg) {
 
-            this -> ticfl0 = msg2->position[0];
-            this -> ticfr0 = msg2->position[1];
-            this -> ticrl0 = msg2->position[2];
-            this -> ticrr0 = msg2->position[3];
+        if(this->wheelCount == 0) {
+            this -> ticfl = msg->position[0];
+            this -> ticfr = msg->position[1];
+            this -> ticrl = msg->position[2];
+            this -> ticrr = msg->position[3];
         }
-        else{
-            this -> x = msg1 -> pose.position.x;
-            this -> y = msg1 -> pose.position.y;
-            quat_msg = msg1 -> pose.orientation;
-            tf2::fromMsg(quat_msg, q);
-            tf2::Matrix3x3 m(q);
-            m.getRPY(roll, pitch, yaw);
-            this -> theta = yaw;
-            this -> ts = msg1 -> header.stamp;
-
-            this -> deltats = ts - ts0;
-            this -> wz = (theta - theta0)/deltats.toSec();
-            this -> vx = (sin(theta0)*(y-y0)+cos(theta0)*(x-x0))/deltats.toSec();
-            this -> vy = (cos(theta0)*(y-y0)-sin(theta0)*(x-x0))/deltats.toSec();
-            x0 = x;
-            y0 = y;
-            theta0 = theta;
-
-            this -> ticfl = msg2->position[0];
-            this -> ticfr = msg2->position[1];
-            this -> ticrl = msg2->position[2];
-            this -> ticrr = msg2->position[3];
-
-            if (msgCount%2 == 0) {
-                this -> wheelRad = (wz*deltats.toSec()*gearRatio*tickRes*(halfLength + halfWidth)*4)/(2*M_PI*(-(ticfl-ticfl0)+(ticfr-ticfr0)-(ticrl-ticrl0)+(ticrr-ticrr0)));
-                ROS_INFO("Wheel radius: %f", wheelRad);
-            }
-            if (msgCount%2 == 1) {
-                this -> tickRes = ((-(ticfl-ticfl0)+(ticfr-ticfr0)-(ticrl-ticrl0)+(ticrr-ticrr0))*2*M_PI*wheelRad)/(deltats.toSec()*gearRatio*wz*(halfLength + halfWidth)*4);
-                ROS_INFO("Tick res: %f", tickRes);
-            }
+        else {
             ticfl0 = ticfl;
             ticfr0 = ticfr;
             ticrl0 = ticrl;
             ticrr0 = ticrr;
+
+            this -> ticfl = msg->position[0];
+            this -> ticfr = msg->position[1];
+            this -> ticrl = msg->position[2];
+            this -> ticrr = msg->position[3];
+            
+            paramCalibration();
         }
-        ++msgCount;
-    }
-
-    void wheelCallback(const geometry_msgs::PoseStamped::ConstPtr& msg1) {
+        
+        ++wheelCount;
 
     }
+
+    void poseSubCallback(const geometry_msgs::PoseStamped::ConstPtr& msg) {
+
+        if(this->poseCount == 0) {
+            ts = msg->header.stamp;
+            x = msg -> pose.position.x;
+            y = msg -> pose.position.y;
+            quat_msg = msg -> pose.orientation;
+            tf2::fromMsg(quat_msg, q);
+            tf2::Matrix3x3 m(q);
+            m.getRPY(roll, pitch, yaw);
+            theta = yaw;
+        }
+        else {
+            ts0 = ts;
+            x0 = x;
+            y0 = y;
+            theta0 = theta;
+
+            ts = msg->header.stamp;
+            x = msg -> pose.position.x;
+            y = msg -> pose.position.y;
+            quat_msg = msg -> pose.orientation;
+            tf2::fromMsg(quat_msg, q);
+            tf2::Matrix3x3 m(q);
+            m.getRPY(roll, pitch, yaw);
+            theta = yaw;
+
+            paramCalibration();
+        }
+        
+        ++poseCount;
+    }
+
+    void paramCalibration() {
+
+        if(wheelCount != 0 && poseCount != 0) {
+
+            deltats = ts - ts0;
+            wz = (theta - theta0)/deltats.toSec();
+            vx = (sin(theta0)*(y-y0)+cos(theta0)*(x-x0))/deltats.toSec();
+            vy = (cos(theta0)*(y-y0)-sin(theta0)*(x-x0))/deltats.toSec();
+
+            ROS_INFO("R: %f | N: %f", wheelRad, tickRes);
+            if (paramCount%2 == 0) {
+                tempValue = (wz*deltats.toSec()*gearRatio*tickRes*(halfLength + halfWidth)*4)/(2*M_PI*(-(ticfl-ticfl0)+(ticfr-ticfr0)-(ticrl-ticrl0)+(ticrr-ticrr0)));
+                if(wheelRad<tempValue)
+                    wheelRad -= 0.001;
+                else
+                    wheelRad += 0.001;
+            }
+            if (paramCount%2 == 1) {
+                tempValue = ((-(ticfl-ticfl0)+(ticfr-ticfr0)-(ticrl-ticrl0)+(ticrr-ticrr0))*2*M_PI*wheelRad)/(deltats.toSec()*gearRatio*wz*(halfLength + halfWidth)*4);
+                if(tickRes<tempValue)
+                    tickRes -= 0.001;
+                else
+                    tickRes += 0.001;
+            }
+            ROS_INFO("R: %f | N: %f, tempValue: %f", wheelRad, tickRes, tempValue);
+
+            ++paramCount;
+        }
+    }
+
 
 private:
     ros::NodeHandle n;
@@ -110,8 +136,8 @@ private:
     ros::Duration deltats;
     tf2::Quaternion q;
     geometry_msgs::Quaternion quat_msg;
-    int msgCount;
-    double wheelRad, halfLength, halfWidth, tickRes, gearRatio;
+    int paramCount, wheelCount, poseCount;
+    double wheelRad, halfLength, halfWidth, tickRes, gearRatio, tempValue;
     double ticfl, ticfr, ticrr, ticrl;
     double ticfl0, ticfr0, ticrr0, ticrl0;
 };
