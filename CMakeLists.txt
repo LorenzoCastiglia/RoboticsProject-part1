@@ -63,6 +63,7 @@ add_dependencies(odometry project_1_generate_messages)
 target_link_libraries(odometry ${catkin_LIBRARIES})
 
 add_dependencies(odometry ${PROJECT_NAME}_gencfg)
+add_dependencies(velocitiesTicks ${PROJECT_NAME}_gencfg)
 
 add_executable(wheelsVel src/wheelsVel.cpp)
 add_dependencies(wheelsVel ${catkin_EXPORTED_TARGETS})

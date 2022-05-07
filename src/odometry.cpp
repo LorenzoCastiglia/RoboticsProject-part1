@@ -94,8 +94,8 @@ public:
             ts = msg->header.stamp;
             deltats = ts - ts0;
             theta = theta0 + msg->twist.angular.z * deltats.toSec();
-            x = x0 + deltats.toSec() * (msg->twist.linear.x * cos (theta0) + msg->twist.linear.y * cos (90.0 + theta0));
-            y = y0 + deltats.toSec() * (msg->twist.linear.x * sin (theta0) + msg->twist.linear.y * sin (90.0 + theta0));
+            x = x0 + deltats.toSec() * (msg->twist.linear.x * cos (theta0) - msg->twist.linear.y * sin (theta0));
+            y = y0 + deltats.toSec() * (msg->twist.linear.x * sin (theta0) + msg->twist.linear.y * cos (theta0));
             theta0 = theta;
             x0 = x;
             y0 = y;
@@ -121,8 +121,8 @@ public:
             deltats = ts - ts0;
             theta_avg = theta0 + msg->twist.angular.z * deltats.toSec() / 2;
             theta = theta0 + msg->twist.angular.z * deltats.toSec();
-            x = x0 + deltats.toSec() * (msg->twist.linear.x*cos(theta_avg) + msg->twist.linear.y*cos(90.0+theta_avg));
-            y = y0 + deltats.toSec() * (msg->twist.linear.x*sin(theta_avg) + msg->twist.linear.y*sin(90.0+theta_avg));
+            x = x0 + deltats.toSec() * (msg->twist.linear.x*cos(theta_avg) - msg->twist.linear.y*sin(theta_avg));
+            y = y0 + deltats.toSec() * (msg->twist.linear.x*sin(theta_avg) + msg->twist.linear.y*cos(theta_avg));
 
             // updating past values with current values
             theta0 = theta;

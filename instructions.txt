@@ -1,0 +1,75 @@
+Instructions for "project_1"
+
+Team members
+
+	Davide Mantegazza - 10568661
+	Lorenzo Castiglia - 10578631
+
+
+Files description
+
+	src/velocities.cpp : node in which we calculate the robot velocities starting from wheels RPM
+			     we used this node in the early stages and for comparison purposes
+	src/velocitiesTicks : node in which we calculate the robot velocities starting from encoder tics
+			      it feeds the odometry node through the /cmd_vel topic
+	src/odometry : the node in which the odometry is computed, then it publishes the result in the topic /odom
+		       it offers a reset service to set a new pose for the robot and a dynamic param to change integration method
+	src/tfBroadcast : 
+	src/wheelsVel : read from topic /cmd_vel and calculates back the wheels velocities from the robot velocities,
+			publishes results in /wheels_rpm
+	src/test_listener : 
+	src/checkParams :
+
+	cfg/parameters.cfg : dynamic reconfigure of param "set_method" to change integration method, 0 (default) for Euler, 1 for RK
+	cfg/robotparameters.cfg : 
+	srv/Reset.srv : service to set a new pose for the robot (x y theta)
+	msg/WheelsVel.msg : custom message to broadcast wheels' rpm values on topic /wheels_rpm
+	launch/project_1.launch : launch file, by defaults nodes aren't allowed to print to screen and the static params are all set here
+
+
+Parameters description
+	
+	static params (all set in the launch file)	
+		wheelRadius : radius in meters
+		halfLength : wheel position along x (l) in meters
+		halfWidth : wheel position along y (w) in meters
+		gearRatio : self explanatory
+		tickRes : encoders resolution (N counts per revolution)
+		use_sim_time : param that tells rqt_plot that we are using a bag recording
+		msgInterval : parameter we used to check if, by computing the odometry every few messages
+		      	      instead of every single message, the noise would be improved.
+		      	      In our testing we didn't see a big difference so we set it to 1 by default
+	dynamic params
+		set_method : change integration method, 0 (default) for Euler, 1 for RK
+			     "rosrun rqt_reconfigure rqt_reconfigure" to change it
+		.....
+
+
+Structure of the TF tree
+
+	world -> odom -> base_link
+
+
+Structure of custom messages
+	
+	project_1::WheelsVel
+		Header header
+		float64 rpm_fl
+		float64 rpm_fr
+		float64 rpm_rl
+		float64 rpm_rr
+	NOTE: in the project specification the order requested is fl-fr-rr-rl, however we used this
+	      convention in order to be consistent with the one used in the bags provided.
+
+
+How to start and use the nodes
+
+	our package is called "project_1"
+	to start the nodes "roslaunch project_1 project_1.launch"
+	to change the integration method "rosrun rqt_reconfigure rqt_reconfigure" and switch "set_method" to desired value
+	to set a new pose "rosservice call /reset x y theta"
+	
+
+Additional infos
+	calibration
+
