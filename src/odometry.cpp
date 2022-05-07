@@ -176,15 +176,17 @@ public:
     void parametersCallback(project_1::parametersConfig &config, uint32_t level) {
         // integration method is changed
         
-        if(config.set_method == 0) {  
-            this->set_method = 0;       // Euler
-            ROS_INFO("Dynamic reconfigure: integration method set to Euler");
+        if(level == 0) {
+            if(config.set_method == 0) {  
+                this->set_method = 0;       // Euler
+                ROS_INFO("Dynamic reconfigure: integration method set to Euler");
+            }
+            else {
+                this->set_method = 1;       // Runge-Kutta
+                ROS_INFO("Dynamic reconfigure: integration method set to Runge-Kutta");
+            }
         }
-        else {
-            this->set_method = 1;       // Runge-Kutta
-            ROS_INFO("Dynamic reconfigure: integration method set to Runge-Kutta");
-        }
-}
+    }
 
 private:
 

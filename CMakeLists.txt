@@ -36,6 +36,7 @@ generate_messages(
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
 generate_dynamic_reconfigure_options(
   cfg/parameters.cfg
+  cfg/robotparameters.cfg
 )
 
 catkin_package(CATKIN_DEPENDS geometry_msgs roscpp rospy sensor_msgs std_msgs message_runtime message_filters)

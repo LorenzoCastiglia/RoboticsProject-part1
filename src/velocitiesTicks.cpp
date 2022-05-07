@@ -1,6 +1,8 @@
 #include "ros/ros.h"
 #include "sensor_msgs/JointState.h"
 #include "geometry_msgs/TwistStamped.h"
+#include <dynamic_reconfigure/server.h>
+#include <project_1/robotparametersConfig.h>
 #include <math.h>
 
 class ComputeVelocity {
@@ -23,6 +25,10 @@ public:
         n.getParam("/halfWidth", this->halfWidth);
         n.getParam("/tickRes", this->tickResolution);
         n.getParam("/msgInterval", this->msgInterval);
+
+        // dynamic reconfigure setup
+        this->f = boost::bind(&ComputeVelocity::parametersCallback, this, _1, _2);
+        this->dynServer.setCallback(f);
 	}
 
     void mainLoop(){
@@ -113,9 +119,35 @@ public:
             }
             
         }
-
         ++msgCount;
 
+    }
+
+    void parametersCallback(project_1::robotparametersConfig &config, uint32_t level) {
+        // changes robot parameters
+        
+        switch(level) {
+            case 0:
+                // wheelRadius changed
+                this->wheelRadius = config.wheelRadius;
+                ROS_INFO("Dynamic reconfigure: wheelRadius set to %f", this->wheelRadius);
+                break;
+            case 1:
+                // halfLenght changed
+                this->halfLength = config.halfLength;
+                ROS_INFO("Dynamic reconfigure: halfLength set to %f", this->halfLength);
+                break;
+            case 2:
+                // halfWidth changed
+                this->halfWidth = config.halfWidth;
+                ROS_INFO("Dynamic reconfigure: halfWidth set to %f", this->halfWidth);
+                break;
+            case 3:
+                // tickRes changed
+                this->tickResolution = config.tickRes;
+                ROS_INFO("Dynamic reconfigure: tickResolution set to %d", this->tickResolution);
+                break;
+        }
     }
 
 private:
@@ -123,6 +155,10 @@ private:
 	ros::NodeHandle n;
 	ros::Subscriber sensorInput;
 	ros::Publisher velocitiesPub;
+
+    dynamic_reconfigure::Server<project_1::robotparametersConfig> dynServer;
+    dynamic_reconfigure::Server<project_1::robotparametersConfig>::CallbackType f;
+
     int gearRatio;
     double wheelRadius;
     double halfLength;
