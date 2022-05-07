@@ -67,46 +67,46 @@ public:
 
                 ts = msg->header.stamp;
                 deltats = ts - ts0;
-                ROS_INFO("deltats: %lf", deltats.toSec());
-                ROS_INFO("msg count: %d", msgCount);
+                //ROS_INFO("deltats: %lf", deltats.toSec());
+                //ROS_INFO("msg count: %d", msgCount);
 
                 // front-left wheel
                 ticfl = msg->position[0]/gearRatio;
                 wfl = (ticfl - ticfl0)/deltats.toSec()*2*M_PI/tickResolution;
-                ROS_INFO("deltatic: %d", ticfl-ticfl0);
-                ROS_INFO("Rot fl: %lf", wfl);
+                //ROS_INFO("deltatic: %d", ticfl-ticfl0);
+                //ROS_INFO("Rot fl: %lf", wfl);
                 ticfl0 = ticfl;
 
                 // front-right wheel
                 ticfr = msg->position[1]/gearRatio;
                 wfr = (ticfr - ticfr0)/deltats.toSec()*2*M_PI/tickResolution;
-                ROS_INFO("deltatic: %d", ticfr-ticfr0);
-                ROS_INFO("Rot fr: %lf", wfr);
+                //ROS_INFO("deltatic: %d", ticfr-ticfr0);
+                //ROS_INFO("Rot fr: %lf", wfr);
                 ticfr0 = ticfr;
 
                 // rear-left wheel
                 ticrl = msg->position[2]/gearRatio;
                 wrl = (ticrl - ticrl0)/deltats.toSec()*2*M_PI/tickResolution;
-                ROS_INFO("deltatic: %d", ticrl-ticrl0);
-                ROS_INFO("Rot rl: %lf", wrl);
+                //ROS_INFO("deltatic: %d", ticrl-ticrl0);
+                //ROS_INFO("Rot rl: %lf", wrl);
                 ticrl0 = ticrl;
 
                 // rear-right wheel
                 ticrr = msg->position[3]/gearRatio;
                 wrr = (ticrr - ticrr0)/deltats.toSec()*2*M_PI/tickResolution;
-                ROS_INFO("deltatic: %d", ticrr-ticrr0);
-                ROS_INFO("Rot rr: %lf", wrr);
+                //ROS_INFO("deltatic: %d", ticrr-ticrr0);
+                //ROS_INFO("Rot rr: %lf", wrr);
                 ticrr0 = ticrr;
 
                 ts0 = ts;
 
                 // robot velocities
                 vx = (wfl+wfr+wrr+wrl)*wheelRadius/4;
-                ROS_INFO("Vel x: %lf", vx);
+                //ROS_INFO("Vel x: %lf", vx);
                 vy = (-wfl+wfr+wrl-wrr)*wheelRadius/4;
-                ROS_INFO("Vel y: %lf", vy);
+                //ROS_INFO("Vel y: %lf", vy);
                 wz = (-wfl+wfr-wrl+wrr)*wheelRadius/(4*(halfWidth+halfLength));
-                ROS_INFO("W z: %lf", wz);
+                //ROS_INFO("W z: %lf", wz);
 
                 // publishing cmd_vel message
                 geometry_msgs::TwistStamped velMsg;

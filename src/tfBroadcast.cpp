@@ -2,6 +2,7 @@
 #include "nav_msgs/Odometry.h"
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_ros/transform_broadcaster.h>
+#include <tf2_ros/static_transform_broadcaster.h>
 #include <geometry_msgs/TransformStamped.h>
 
 class tfBroadcast
@@ -12,6 +13,7 @@ public:
     }
 
     void transformCallback(const nav_msgs::Odometry::ConstPtr &msg){
+
         transformStamped.header.stamp = ros::Time::now();
         transformStamped.header.frame_id = "odom";
         transformStamped.child_frame_id = "base_link";
@@ -25,12 +27,32 @@ public:
 
         toBaseLBr.sendTransform(transformStamped);
 
+        static_transformStamped.header.stamp = ros::Time::now();
+        static_transformStamped.header.frame_id = "world";
+        static_transformStamped.child_frame_id = "odom";
+        static_transformStamped.transform.translation.x = 0;
+        static_transformStamped.transform.translation.y = 0;
+        static_transformStamped.transform.translation.z = 0;
+        tf2::Quaternion q;
+        q.setRPY(0, 0, 0);
+        static_transformStamped.transform.rotation.x = q.x();
+        static_transformStamped.transform.rotation.y = q.y();
+        static_transformStamped.transform.rotation.z = q.z();
+        static_transformStamped.transform.rotation.w = q.w();
+    
+        static_broadcaster.sendTransform(static_transformStamped);
+
+
     }
 private:
     ros::NodeHandle n;
     ros::Subscriber odomSub;
+
     tf2_ros::TransformBroadcaster toBaseLBr;
     geometry_msgs::TransformStamped transformStamped;
+
+    tf2_ros::StaticTransformBroadcaster static_broadcaster;
+    geometry_msgs::TransformStamped static_transformStamped;
 };
 
 int main(int argc, char **argv) {
