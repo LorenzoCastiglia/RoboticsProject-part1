@@ -87,20 +87,15 @@ public:
         if(ts0.nsec == 0) {
             // When the first message is received, the new timestamp is saved but no
             // odometry is performed since we only have the first value of v and omega
-            ts0.sec = msg->header.stamp.sec; 
-            ts0.nsec = msg->header.stamp.nsec;
+            ts0 = msg->header.stamp;
         }
 
         else {
-            ts.sec = msg->header.stamp.sec; 
-            ts.nsec = msg->header.stamp.nsec;
+            ts = msg->header.stamp;
             deltats = ts - ts0;
             theta = theta0 + msg->twist.angular.z * deltats.toSec();
-            ROS_INFO("Theta: %f", theta);
             x = x0 + deltats.toSec() * (msg->twist.linear.x * cos (theta0) + msg->twist.linear.y * cos (90.0 + theta0));
-            ROS_INFO("X: %f", x);
             y = y0 + deltats.toSec() * (msg->twist.linear.x * sin (theta0) + msg->twist.linear.y * sin (90.0 + theta0));
-            ROS_INFO("Y: %f", y);
             theta0 = theta;
             x0 = x;
             y0 = y;
@@ -117,14 +112,12 @@ public:
         if(ts0.nsec == 0.0) {
             // When the first message is received, the new timestamp is saved but no
             // odometry is performed since we only have the first value of v and omega
-            ts0.sec = msg->header.stamp.sec; 
-            ts0.nsec = msg->header.stamp.nsec;;
+            ts0 = msg->header.stamp;
         }
 
         else {
             // starting from the second message received, the odometry is computed
-            ts.sec = msg->header.stamp.sec; 
-            ts.nsec = msg->header.stamp.nsec;
+            ts = msg->header.stamp;
             deltats = ts - ts0;
             theta_avg = theta0 + msg->twist.angular.z * deltats.toSec() / 2;
             theta = theta0 + msg->twist.angular.z * deltats.toSec();
@@ -153,6 +146,9 @@ public:
         this->y0 = req.y_new;
         this->theta0 = req.theta_new;
 
+        this->ts0.sec = 0;
+        this->ts0.nsec = 0;
+
         //publishOdometry(msg);
         nav_msgs::Odometry odomMsg;
         tf2::Quaternion q;
@@ -160,6 +156,7 @@ public:
 
         odomMsg.child_frame_id = "base_link";
         odomMsg.header.frame_id = "odom";
+        odomMsg.header.stamp = this->ts;
         odomMsg.pose.pose.position.x = this -> x0;
         odomMsg.pose.pose.position.y = this -> y0;
         odomMsg.pose.pose.position.z = 0.0;
