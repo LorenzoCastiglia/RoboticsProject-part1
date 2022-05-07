@@ -13,15 +13,15 @@ public:
         n.getParam("/wheelRadius", this->wheelRadius);
         n.getParam("/halfLenght", this->halfLength);
         n.getParam("/halfWidth", this->halfWidth);
-        //n.getParam("/tickRes", this->tickResolution);
 	}
     void mainLoop(){
         ros::Rate loop_rate(10);
-        ROS_INFO("Wheel velocity node started\n");
+        ROS_INFO("Wheels' angular velocity node started\n");
         ros::spin();
         
     }
     void velCallback(const geometry_msgs::TwistStamped::ConstPtr &msg){
+        //Save robot velocities received from topic /cmd_vel
         vx = msg -> twist.linear.x;
         ROS_INFO("Vel x: %f", vx);
         vy = msg -> twist.linear.y;
@@ -29,6 +29,7 @@ public:
         wz = msg -> twist.angular.z;
         ROS_INFO("W z: %f", wz);
 
+        //Computed wheels' angular speeds from robot velocities (front-left, front-right, rear-left, rear-right)
         wfl = 1/wheelRadius * (vx - vy - (halfLength + halfWidth) * wz);
         ROS_INFO("Rot fl: %f", wfl);
         wfr = 1/wheelRadius * (vx + vy + (halfLength + halfWidth) * wz);
@@ -38,6 +39,7 @@ public:
         wrr = 1/wheelRadius * (vx - vy + (halfLength + halfWidth) * wz);
         ROS_INFO("Rot rl: %f", wrr);
 
+        //Create custom wheel velocities message and publish it on topic /wheels_rpm
         project_1::WheelsVel wheelsMsg;
         wheelsMsg.rpm_fl = wfl;
         wheelsMsg.rpm_fr = wfr;

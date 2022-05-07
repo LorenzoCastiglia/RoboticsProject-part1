@@ -48,9 +48,6 @@ catkin_package(CATKIN_DEPENDS geometry_msgs roscpp rospy sensor_msgs std_msgs me
 ## Specify additional locations of header files
 include_directories(include ${catkin_INCLUDE_DIRS})
 
-add_executable(test_listener src/test_listener.cpp)
-target_link_libraries(test_listener ${catkin_LIBRARIES})
-
 add_executable(velocities src/velocities.cpp)
 target_link_libraries(velocities ${catkin_LIBRARIES})
 

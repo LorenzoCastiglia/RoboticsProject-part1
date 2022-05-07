@@ -12,20 +12,14 @@ public:
         n.getParam("/wheelRadius", this->wheelRadius);
         n.getParam("/halfLenght", this->halfLength);
         n.getParam("/halfWidth", this->halfWidth);
-        //n.getParam("/tickRes", this->tickResolution);
 	}
     void mainLoop(){
-        //ros::Rate loop_rate(10);
-        ROS_INFO("Geometry node started\n");
+        ROS_INFO("Robot velocity node started\n");
         ros::spin();
-        /*
-        while (ros::ok()) {
-            ros::spinOnce();
-            loop_rate.sleep();
-        }*/
         
     }
     void sensorCallback(const sensor_msgs::JointState::ConstPtr& msg){
+        //Acquisition of wheels' angular velocities (front-left, front-right, rear-left, rear-right)
         wfl = msg->velocity[0]/(60*gearRatio);
         ROS_INFO("Rot fl: %f", wfl);
         wfr = msg->velocity[1]/(60*gearRatio);
@@ -35,6 +29,7 @@ public:
         wrr = msg->velocity[3]/(60*gearRatio);
         ROS_INFO("Rot rr: %f", wrr);
 
+        //Computation of robot frame velocities
         vx = (wfl+wfr+wrl+wrr)*wheelRadius/4;
         ROS_INFO("Vel x: %f", vx);
         vy = (-wfl+wfr+wrl-wrr)*wheelRadius/4;
@@ -42,6 +37,7 @@ public:
         wz = (-wfl+wfr-wrl+wrr)*wheelRadius/(4*(halfWidth+halfLength));
         ROS_INFO("W z: %f", wz);
 
+        //Pubblication of robot frame velocities on topic /wheel_states
         geometry_msgs::TwistStamped velMsg;
         velMsg.header.stamp.sec = msg->header.stamp.sec;
         velMsg.header.stamp.nsec = msg -> header.stamp.nsec;

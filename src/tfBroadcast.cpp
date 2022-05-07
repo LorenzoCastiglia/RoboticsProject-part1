@@ -8,12 +8,13 @@
 class tfBroadcast
 {
 public:
-    tfBroadcast(/* args */){
+    tfBroadcast(){
         this -> odomSub = n.subscribe("/odom", 1000, &tfBroadcast::transformCallback, this);
     }
 
     void transformCallback(const nav_msgs::Odometry::ConstPtr &msg){
 
+        //Transformation from odometry frame to robot frame
         transformStamped.header.stamp = ros::Time::now();
         transformStamped.header.frame_id = "odom";
         transformStamped.child_frame_id = "base_link";
@@ -27,6 +28,7 @@ public:
 
         toBaseLBr.sendTransform(transformStamped);
 
+        //Transformation from world frame (fixed frame) to odometry frame
         static_transformStamped.header.stamp = ros::Time::now();
         static_transformStamped.header.frame_id = "world";
         static_transformStamped.child_frame_id = "odom";

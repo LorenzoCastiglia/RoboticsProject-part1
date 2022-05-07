@@ -33,13 +33,6 @@ public:
         ROS_INFO("Odometry node started\n");
 
         ros::spin();
-        /*
-        ros::Rate loop_rate(10);
-        while (ros::ok()) {
-            ros::spinOnce();
-            loop_rate.sleep();
-        }
-        */
     }
 
     double computeTimeStamp(geometry_msgs::TwistStamped::ConstPtr &msg) {
