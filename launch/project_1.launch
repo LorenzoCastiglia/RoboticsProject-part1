@@ -12,6 +12,5 @@
     <node pkg="project_1" type="odometry" name="ComputeOdometry" output="screen" />
     <node pkg="project_1" type="tfBroadcast" name="tfBroadcast" />
     <node pkg="project_1" type="wheelsVel" name="WheelsVelocities" />
-    <node pkg="project_1" type="checkParams" name="checkParams" />
 
 </launch>
