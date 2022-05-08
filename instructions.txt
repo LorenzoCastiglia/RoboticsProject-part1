@@ -17,12 +17,12 @@ Files description
 	src/tfBroadcast: this node is used to define the robot transformation frames, specifically the world frame, the odometry frame and the robot frame (base_link)
 					It also implements the broadcast messages from world to odometry frame and from odometry to base_link frame
 	src/wheelsVel: read from topic /cmd_vel and calculates back the wheels velocities from the robot velocities,
-			publishes results with messages of custom type sent on the /wheels_rpm topic
+				   publishes results with messages of custom type sent on the /wheels_rpm topic in rad/s
 	src/checkParams :
 
 	cfg/parameters.cfg : dynamic reconfigure of param "set_method" to change integration method, 0 (default) for Euler, 1 for RK
 	cfg/robotparameters.cfg : 
-	srv/Reset.srv : service to set a new pose for the robot (x y theta)
+	srv/ResetPose.srv : service to set a new pose for the robot (x y theta)
 	msg/WheelsVel.msg : custom message to broadcast wheels' rpm values on topic /wheels_rpm
 	launch/project_1.launch : launch file, by defaults nodes aren't allowed to print to screen and the static params are all set here
 
@@ -30,19 +30,21 @@ Files description
 Parameters description
 	
 	static params (all set in the launch file)	
-		wheelRadius : radius in meters
-		halfLength : wheel position along x (l) in meters
-		halfWidth : wheel position along y (w) in meters
-		gearRatio : self explanatory
-		tickRes : encoders resolution (N counts per revolution)
+		
+		gearRatio : self explanatory		
 		use_sim_time : param that tells rqt_plot that we are using a bag recording
 		msgInterval : parameter we used to check if, by computing the odometry every few messages
 		      	      instead of every single message, the noise would be improved.
 		      	      In our testing we didn't see a big difference so we set it to 1 by default
+	
 	dynamic params
-		set_method : change integration method, 0 (default) for Euler, 1 for RK
-			     "rosrun rqt_reconfigure rqt_reconfigure" to change it
-		.....
+	"rosrun rqt_reconfigure rqt_reconfigure" to change them
+		
+		set_method : change integration method, 0 (default) for Euler, 1 for RK		     
+		wheelRadius : radius in meters
+		halfLength : wheel position along x (l) in meters
+		halfWidth : wheel position along y (w) in meters
+		tickRes : encoders resolution (N counts per revolution)
 
 
 Structure of the TF tree
@@ -67,9 +69,10 @@ How to start and use the nodes
 	our package is called "project_1"
 	to start the nodes "roslaunch project_1 project_1.launch"
 	to change the integration method "rosrun rqt_reconfigure rqt_reconfigure" and switch "set_method" to desired value
-	to set a new pose "rosservice call /reset x y theta"
+	to set a new pose "rosservice call /resetPose x y theta"
 	
 
 Additional infos
 	calibration
+	Robot parameters are dynamic in order to perform calibration without recompiling. velocitiesTicks 
 

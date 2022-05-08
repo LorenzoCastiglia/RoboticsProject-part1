@@ -1,7 +1,7 @@
 #include "ros/ros.h"
 #include "geometry_msgs/TwistStamped.h"
 #include "nav_msgs/Odometry.h"
-#include "project_1/Reset.h"
+#include "project_1/ResetPose.h"
 #include <tf2/LinearMath/Quaternion.h>
 #include <dynamic_reconfigure/server.h>
 #include <project_1/parametersConfig.h>
@@ -14,7 +14,7 @@ public:
         
         this->velInput=this->n.subscribe("/cmd_vel", 1000, &ComputeOdometry::callOdometryMethod, this);
         this->odomPub=this->n.advertise<nav_msgs::Odometry>("/odom", 1000);
-        this-> resetService = this->n.advertiseService("reset", &ComputeOdometry::resetCallback, this);
+        this-> resetService = this->n.advertiseService("resetPose", &ComputeOdometry::resetCallback, this);
                 
         this->x0 = 0.0;
         this->y0 = 0.0;
@@ -128,7 +128,7 @@ public:
         }
     }
 
-    bool resetCallback(project_1::Reset::Request  &req, project_1::Reset::Response &res) {
+    bool resetCallback(project_1::ResetPose::Request  &req, project_1::ResetPose::Response &res) {
         // reset the robot pose to the desired values
 
         res.x_old = this->x0;
